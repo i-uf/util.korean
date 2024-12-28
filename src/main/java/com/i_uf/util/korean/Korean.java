@@ -1,29 +1,32 @@
 package com.i_uf.util.korean;
 /**이 수업은 한글의 타자기 배열 순서를 이용하여 한글을 다른 형태로 변형시키는 수업입니다. 외부 수업을 가져오지 않았습니다.
- * @author I_uf <i>(uf_developer@outlook.kr)*/
+ * @author I_uf <i>(uf_developer@outlook.kr)</i>*/
 public final class Korean { /*모든 공용 함수에 사용 설명서 포함됨*/
     private Korean() {}
-    private static final String cho = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
-    private static final String jong = "ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ";
+    public static final String cho = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
+    public static final String jong = "ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ";
     private static final String[] en = "rRseEfaqQtTdwWczxvg:koiOjpuPhynbml:ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅛㅜㅠㅡㅣ".split(":");
     private static final String[] jaEn = "r:R:rt:s:sw:sg:e:E:f:fr:fa:fq:ft:fx:fv:fg:a:q:Q:qt:t:T:d:w:W:c:z:x:v:g".split(":");
     private static final String[] moEn = "k:o:i:O:j:p:u:P:h:hk:ho:hl:y:n:nj:np:nl:b:m:ml:l".split(":");
-    private static final char[][] range = {{'ㄱ', 'ㅎ'}, {'ㅏ', 'ㅣ'}, {'가', '힣'}, {'A', 'Z'}, {'a', 'z'}};
-    private static boolean in(char c, int index) { return range[index][0] <= c && range[index][1] >= c; }
-    private static boolean han(char c) { return in(c, 0) || in(c, 1) || in(c, 2); }
+    private static final char[][] range = {{'ㄱ', 'ㅎ'}, {'ㅏ', 'ㅣ'}, {'가', '힣'}, {'A', 'Z'}, {'a', 'z'}, {' ', '~'}};
+    /**문자가 색인 번호에 따라 0부터 순서대로 자음, 모음, 한글 음절, 알파벳 대문자, 알파벳 소문자, 또는 아스키코드인지 여부를 반환합니다.*/
+    public static boolean in(char c, int index) { return range[index][0] <= c && range[index][1] >= c; }
+    /**문자가 한글인지 여부를 반환합니다.
+     * @see #in(char, int)*/
+    public static boolean han(char c) { return in(c, 0) || in(c, 1) || in(c, 2); }
     private static boolean ja(char c, int i) { return (i>0 ? cho : jong).indexOf(c) < 0; }
-    private static boolean alpha(char c) { return in(c, 3) || in(c, 4); }
+    /**문자가 알파벳인지 여부를 반환합니다.
+     * @see #in(char, int)*/
+    public static boolean alpha(char c) { return in(c, 3) || in(c, 4); }
     private static char last(String s) { return s.charAt(s.length() - 1); }
     private static String test(char t, String f) { return ""+(t == 0 ? f : t); }
-    /**이 함수는 문자열의 모든 한글을 세세하게 분해시킵니다.*/
+    /**문자열의 모든 한글을 세세하게 분해시킵니다.*/
     public static String boonhae(String s) {
         return boonhae(s, false);
-    }
-    /**이 함수는 문자열의 모든 한글을 분해시킵니다.*/
+    }/**문자열의 모든 한글을 분해시킵니다.*/
     public static String boonhae(String s, boolean simplyDiv) {
         return s.chars().boxed().map(integer -> boonhae((char) integer.intValue(), simplyDiv)).reduce("", String::concat);
-    }
-    /**이 함수는 한글 문자를 초성, 중성, 종성으로 분해시킵니다.*/
+    }/**한글 문자를 초성, 중성, 종성으로 분해시킵니다.*/
     public static String boonhae(char c) { return boonhae(c, true); }
     private static String boonhae(char c, boolean simplyDiv) {
         return in(c, 0) ? boonhae_Ja(c, simplyDiv) : in(c, 1) ? boonhae_Mo(c, simplyDiv) :
@@ -43,8 +46,7 @@ public final class Korean { /*모든 공용 함수에 사용 설명서 포함됨
             case 'ㅘ' -> "ㅗㅏ"; case 'ㅙ' -> "ㅗㅐ"; case 'ㅚ' -> "ㅗㅣ"; case 'ㅝ' -> "ㅜㅓ";
             case 'ㅞ' -> "ㅜㅔ"; case 'ㅟ' -> "ㅜㅣ"; case 'ㅢ' -> "ㅡㅣ"; default -> ""+c;
         };
-    }
-    /**이 함수는 문자열의 모든 한글을 합체합니다.*/
+    }/**문자열의 모든 한글을 합체합니다.*/
     public static String hapche(String s) {
         if(s == null || s.isBlank()) return s; s = boonhae(s);
         StringBuilder result = new StringBuilder(); char temp = s.charAt(0);
@@ -52,8 +54,7 @@ public final class Korean { /*모든 공용 함수에 사용 설명서 포함됨
             if(-result.append(hapche(temp, s.charAt(i)).charAt(0)).hashCode() < (temp=
                     hapche(temp, s.charAt(i)).charAt(1)));else;else temp = hapche(temp, s.charAt(i)).charAt(0);
         return result.append(temp).toString();
-    }
-    /**이 함수는 한글 문자 두개를 합체 합니다.*/
+    }/**한글 문자 두개를 합체 합니다.*/
     public static String hapche(char a, char b) {
         if(!han(a) || !(in(b, 0) || in(b, 1))) return "" + a + b;
         char[] c = boonhae(a, true).toCharArray();
@@ -80,8 +81,7 @@ public final class Korean { /*모든 공용 함수에 사용 설명서 포함됨
             case "ㅗㅏ" -> 'ㅘ'; case "ㅘㅣ" -> 'ㅙ'; case "ㅗㅣ" -> 'ㅚ'; case "ㅜㅓ" -> 'ㅝ';
             case "ㅝㅣ" -> 'ㅞ'; case "ㅜㅣ" -> 'ㅟ'; case "ㅡㅣ" -> 'ㅢ'; default -> 0;
         };
-    }
-    /**이 함수는 영문과 한글을 반전시킵니다*/
+    }/**영문과 한글을 반전시킵니다.*/
     public static String banjeon(String s) {return s==null||s.isEmpty()?s:hapche(boonhae(s, true).chars().mapToObj(
             a->in((char)a, 0) ? jaEn[a-'ㄱ'] : in((char)a, 1) ? moEn[a-'ㅏ'] : alpha((char)a) ?
                 en[0].contains("" + (char)a) ? "" + cho.charAt(en[0].indexOf(a)) : en[1].contains(""+(char)a)?
