@@ -35,14 +35,14 @@ public final class Korean { /*모든 공용 함수에 사용 설명서 포함됨
                     "" : boonhae_Ja(jong.charAt((c - '가') % 28 - 1), simplyDiv)) : ""+c;
     }
     private static String boonhae_Ja(char c, boolean doNothing) {
-        return doNothing ? String.valueOf(c) : switch (c) {
+        return doNothing ? ""+c : switch (c) {
             case 'ㄳ' -> "ㄱㅅ"; case 'ㄵ' -> "ㄴㅈ"; case 'ㄶ' -> "ㄴㅎ"; case 'ㄺ' -> "ㄹㄱ";
             case 'ㄻ' -> "ㄹㅁ"; case 'ㄼ' -> "ㄹㅂ"; case 'ㄽ' -> "ㄹㅅ"; case 'ㄾ' -> "ㄹㅌ";
             case 'ㄿ' -> "ㄹㅍ"; case 'ㅀ' -> "ㄹㅎ"; case 'ㅄ' -> "ㅂㅅ"; default -> ""+c;
         };
     }
     private static String boonhae_Mo(char c, boolean doNothing) {
-        return doNothing ? String.valueOf(c) : switch (c) {
+        return doNothing ? ""+c : switch (c) {
             case 'ㅘ' -> "ㅗㅏ"; case 'ㅙ' -> "ㅗㅐ"; case 'ㅚ' -> "ㅗㅣ"; case 'ㅝ' -> "ㅜㅓ";
             case 'ㅞ' -> "ㅜㅔ"; case 'ㅟ' -> "ㅜㅣ"; case 'ㅢ' -> "ㅡㅣ"; default -> ""+c;
         };
@@ -78,13 +78,23 @@ public final class Korean { /*모든 공용 함수에 사용 설명서 포함됨
     }
     private static char hapche_Mo(char a, char b) {
         return switch ("" + a + b) {
-            case "ㅗㅏ" -> 'ㅘ'; case "ㅘㅣ" -> 'ㅙ'; case "ㅗㅣ" -> 'ㅚ'; case "ㅜㅓ" -> 'ㅝ';
-            case "ㅝㅣ" -> 'ㅞ'; case "ㅜㅣ" -> 'ㅟ'; case "ㅡㅣ" -> 'ㅢ'; default -> 0;
+            case "ㅗㅏ" -> 'ㅘ'; case "ㅗㅐ" -> 'ㅙ'; case "ㅗㅣ" -> 'ㅚ'; case "ㅜㅓ" -> 'ㅝ';
+            case "ㅜㅔ" -> 'ㅞ'; case "ㅜㅣ" -> 'ㅟ'; case "ㅡㅣ" -> 'ㅢ'; default -> 0;
         };
     }/**영문과 한글을 반전시킵니다.*/
     public static String banjeon(String s) {return s==null||s.isEmpty()?s:hapche(boonhae(s, true).chars().mapToObj(
             a->in((char)a, 0) ? jaEn[a-'ㄱ'] : in((char)a, 1) ? moEn[a-'ㅏ'] : alpha((char)a) ?
                 en[0].contains("" + (char)a) ? "" + cho.charAt(en[0].indexOf(a)) : en[1].contains(""+(char)a)?
                 "" + en[2].charAt(en[1].indexOf(a)) : "" + (char)a : "" + (char)a).reduce("", String::concat));
+    }/**초성으로 비교합니다. 만약 문자가 초성이 아니라면 같은 글자일 경우에만 성공합니다.*/
+    public static boolean choMatch(char target, char c) {
+        return cho.contains(""+c) ? boonhae(c).charAt(0) == boonhae(target).charAt(0) : c == target;
+    }/**초성으로 비교합니다. 만약 문자가 초성이 아니라면 같은 글자일 경우에만 성공합니다*/
+    public static boolean choMatch(String target, String s) {
+        for(int i = 0; i < s.length(); i++) if(!choMatch(target.charAt(i), s.charAt(i))) return false;
+        return true;
+    }/**검색합니다.*/
+    public static String[] basicSearch(String[] target, String s, String[] dst) {
+        for(int i = 0, count = 0; i < target.length; i++) if(choMatch(target[i], s)) dst[count++] = target[i]; return dst;
     }
 }

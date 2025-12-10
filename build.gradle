@@ -1,10 +1,11 @@
 plugins {
     id 'java'
     id 'maven-publish'
+    id 'signing'
 }
 
 group = 'com.i_uf'
-version = '1.0.0'
+version = '1.1.0'
 
 tasks.register('sourcesJar', Jar) {
     from sourceSets.main.allSource
@@ -17,7 +18,8 @@ publishing {
             artifact sourcesJar
             pom {
                 name.set('util.korean')
-                description.set('divide korean, combine korean, and invert the english and korean keyboard')
+                description.set('korean utils')
+                url.set('https://github.com/i-uf/util.korean')
                 licenses {
                     license {
                         name.set('Apache License 2.0')
@@ -31,10 +33,27 @@ publishing {
                         email.set('uf_developer@outlook.kr')
                     }
                 }
+                scm {
+                    url = 'https://github.com/i-uf/util.korean'
+                    connection = 'scm:git:git://github.com/i-uf/util.korean.git'
+                    developerConnection = 'scm:git:ssh://github.com:i-uf/util.korean.git'
+                }
             }
         }
     }
     repositories {
         mavenLocal()
+        maven {
+            name = "sonatype"
+            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            credentials {
+                username = project.findProperty("mavenCentralUsername")
+                password = project.findProperty("mavenCentralPassword")
+            }
+        }
     }
+}
+
+signing {
+    sign publishing.publications.mavenJava
 }
