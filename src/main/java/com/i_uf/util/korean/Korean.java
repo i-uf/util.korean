@@ -8,9 +8,9 @@ public final class Korean { /*모든 공용 함수에 사용 설명서 포함됨
     private static final String[] en = "rRseEfaqQtTdwWczxvg:koiOjpuPhynbml:ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅛㅜㅠㅡㅣ".split(":");
     private static final String[] jaEn = "r:R:rt:s:sw:sg:e:E:f:fr:fa:fq:ft:fx:fv:fg:a:q:Q:qt:t:T:d:w:W:c:z:x:v:g".split(":");
     private static final String[] moEn = "k:o:i:O:j:p:u:P:h:hk:ho:hl:y:n:nj:np:nl:b:m:ml:l".split(":");
-    private static final char[][] range = {{'ㄱ', 'ㅎ'}, {'ㅏ', 'ㅣ'}, {'가', '힣'}, {'A', 'Z'}, {'a', 'z'}, {' ', '~'}};
-    /**문자가 색인 번호에 따라 0부터 순서대로 자음, 모음, 한글 음절, 알파벳 대문자, 알파벳 소문자, 또는 아스키코드인지 여부를 반환합니다.*/
-    public static boolean in(char c, int index) { return range[index][0] <= c && range[index][1] >= c; }
+    private static final char[] range = "ㄱㅎㅏㅣ가힣AZaz ~".toCharArray();
+    /**문자가 색인 번호에 따라 0부터 순서대로 자음, 모음, 한글 음절, 알파벳 대문자, 알파벳 소문자, 또는 출력 가능한 아스키코드인지 여부를 반환합니다.*/
+    public static boolean in(char c, int index) { return range[index*2] <= c && range[index*2+1] >= c; }
     /**문자가 한글인지 여부를 반환합니다.
      * @see #in(char, int)*/
     public static boolean han(char c) { return in(c, 0) || in(c, 1) || in(c, 2); }
@@ -21,18 +21,17 @@ public final class Korean { /*모든 공용 함수에 사용 설명서 포함됨
     private static char last(String s) { return s.charAt(s.length() - 1); }
     private static String test(char t, String f) { return ""+(t == 0 ? f : t); }
     /**문자열의 모든 한글을 세세하게 분해시킵니다.*/
-    public static String boonhae(String s) {
-        return boonhae(s, false);
-    }/**문자열의 모든 한글을 분해시킵니다.*/
+    public static String boonhae(String s) { return boonhae(s, false); }
+    /**문자열의 모든 한글을 분해시킵니다.*/
     public static String boonhae(String s, boolean simplyDiv) {
         return s.chars().boxed().map(integer -> boonhae((char) integer.intValue(), simplyDiv)).reduce("", String::concat);
     }/**한글 문자를 초성, 중성, 종성으로 분해시킵니다.*/
     public static String boonhae(char c) { return boonhae(c, true); }
     private static String boonhae(char c, boolean simplyDiv) {
         return in(c, 0) ? boonhae_Ja(c, simplyDiv) : in(c, 1) ? boonhae_Mo(c, simplyDiv) :
-            in(c, 2) ? boonhae_Ja(cho.charAt((c - '가') / 588), simplyDiv) + boonhae_Mo
-                    ((char) ('ㅏ' + (c - '가') % 588 / 28), simplyDiv) + ((c - '가') % 28 == 0 ?
-                    "" : boonhae_Ja(jong.charAt((c - '가') % 28 - 1), simplyDiv)) : ""+c;
+            in(c, 2) ? boonhae_Ja(cho.charAt((c - '가') / 588), simplyDiv) +
+                    boonhae_Mo((char) ('ㅏ' + (c - '가') % 588 / 28), simplyDiv) +
+                    ((c - '가') % 28 == 0 ? "" : boonhae_Ja(jong.charAt((c - '가') % 28 - 1), simplyDiv)) : ""+c;
     }
     private static String boonhae_Ja(char c, boolean doNothing) {
         return doNothing ? ""+c : switch (c) {
@@ -91,10 +90,11 @@ public final class Korean { /*모든 공용 함수에 사용 설명서 포함됨
         return cho.contains(""+c) ? boonhae(c).charAt(0) == boonhae(target).charAt(0) : c == target;
     }/**초성으로 비교합니다. 만약 문자가 초성이 아니라면 같은 글자일 경우에만 성공합니다*/
     public static boolean choMatch(String target, String s) {
-        for(int i = 0; i < s.length(); i++) if(!choMatch(target.charAt(i), s.charAt(i))) return false;
-        return true;
+        for(int i = 0; i < s.length(); i++) if(!choMatch(target.charAt(i), s.charAt(i))) return false; return true;
     }/**검색합니다.*/
-    public static String[] basicSearch(String[] target, String s, String[] dst) {
-        for(int i = 0, count = 0; i < target.length; i++) if(choMatch(target[i], s)) dst[count++] = target[i]; return dst;
+    public static String[] basicSearch(String[] target, String s) {
+        String[] a = new String[target.length], b; int count = 0;
+        for (String string : target) if (choMatch(string, s)) a[count++] = string;
+        for(b = new String[count--]; count >= 0;count--) b[count] = a[count]; return b;
     }
 }
